@@ -8,6 +8,7 @@ image:
 printer:
   enabled: true
   port: 3333
+  host: "ender3v2.otakuneko.net"
 
 nameOverride: ""
 fullnameOverride: ""
