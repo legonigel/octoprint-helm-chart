@@ -17,10 +17,10 @@ service:
   port: 80
 
 ingress:
-  enabled: false
+  enabled: true
   annotations: {}
   paths: []
-  hosts: []
+  hosts: ["ender3v2.otakuneko.net"]
   tls: []
 
 resources: {}
