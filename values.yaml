@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: janekbaraniewski/octoprint
-  tag: latest
+  tag: 1.3.10
   pullPolicy: IfNotPresent
 
 printer:
