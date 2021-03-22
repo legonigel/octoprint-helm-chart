@@ -25,6 +25,6 @@ ingress:
   tls: []
 
 resources: {}
-nodeSelector: {}
+nodeSelector: {kubernetes.io/arch": "arm64"}
 tolerations: []
 affinity: {}
