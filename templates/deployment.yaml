@@ -18,17 +18,31 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "octoprint.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       volumes:
-        - name: printers
-          emptyDir: {}
+        {{- if .Values.hostPrinter.enabled }}
+        - name: printer
+          hostPath:
+            path: {{ .Values.hostPrinter.hostPath }}
+            type: {{ .Values.hostPrinter.hostPathType }}
+        {{- end }}
+        {{- if .Values.webcam.enabled }}
+        - name: webcam
+          hostPath:
+            path: {{ .Values.webcam.hostPath }}
+            type: {{ .Values.webcam.hostPathType }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/bash"]
-{{- if .Values.printer.enabled }}
-          args: ["-c", "socat pty,wait-slave,link=/dev/printer,perm=0660,group=tty tcp:{{ .Values.printer.host }}:{{ .Values.printer.port }} & /OctoPrint-1.3.10/run --iknowwhatimdoing --port 80"]
+{{- if .Values.tcpPrinter.enabled }}
+          args: ["-c", "socat pty,wait-slave,link=/dev/printer,perm=0660,group=tty tcp:{{ .Values.tcpPrinter.host }}:{{ .Values.tcpPrinter.port }} & /OctoPrint-1.3.10/run --iknowwhatimdoing --port 80"]
 {{- else }}
           args: ["-c", "/OctoPrint-1.3.10/run --iknowwhatimdoing --port 80"]
 {{- end }}
@@ -40,7 +54,12 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: MJPEG_STREAMER_AUTOSTART
-              value: "false"
+              value: "{{ .Values.webcam.enabled }}"
+          volumeMounts:
+            - mountPath: /dev/printer
+              name: printer
+            - mountPath: /dev/video0
+              name: webcam
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
