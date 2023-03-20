@@ -31,7 +31,8 @@ persistence:
     # Instead, use the /dev/serial/by-id/X serial device for your printer.
     hostPath: /dev/serial/by-id/usb-Prusa_Research__prusa3d.com__Original_Prusa_i3_MK3_CZPX0221X004XK44811-if00
     hostPathType: CharDevice
-    mountPath: /dev/printer
+    # Don't change this mount path
+    mountPath: /dev/ttyACM0
   webcam:
     enabled: true
     type: hostPath
