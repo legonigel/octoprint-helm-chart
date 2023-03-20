@@ -53,6 +53,8 @@ spec:
           env:
             - name: MJPEG_STREAMER_AUTOSTART
               value: "{{ .Values.webcam.enabled }}"
+            - name: OCTOPRINT_PORT
+              value: "80"
           volumeMounts:
             - mountPath: /dev/printer
               name: printer
