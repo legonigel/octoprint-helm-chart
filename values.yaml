@@ -22,7 +22,7 @@ persistence:
   config:
     enabled: true
     type: pvc
-    size: 1Gi
+    size: 2Gi
   printer:
     enabled: true
     type: hostPath
