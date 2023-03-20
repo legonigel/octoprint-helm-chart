@@ -31,7 +31,7 @@ persistence:
     # Instead, use the /dev/serial/by-id/X serial device for your printer.
     hostPath: /dev/serial/by-id/usb-Prusa_Research__prusa3d.com__Original_Prusa_i3_MK3_CZPX0221X004XK44811-if00
     hostPathType: CharDevice
-    # Don't change this mount path
+    # Don't change this mount path, so the serial device is auto-detected
     mountPath: /dev/ttyACM0
   webcam:
     enabled: true
@@ -74,3 +74,7 @@ affinity:
 
 podAnnotations:
   descheduler.alpha.kubernetes.io/evict: "true"
+
+securityContext:
+  # -- (bool) Privileged securityContext may be required if USB devices are accessed directly through the host machine
+  privileged: true
