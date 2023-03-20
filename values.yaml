@@ -1,51 +1,57 @@
-replicaCount: 1
-
 image:
   repository: octoprint/octoprint
   tag: 1.8.7
   pullPolicy: IfNotPresent
 
+strategy:
+  type: Recreate
 
-# Only one of hostPrinter or tcpPrinter should be enabled.
-hostPrinter:
-  enabled: true
-  # Do not use /dev/ttyUSBX serial devices, as those mappings can change over time.
-  # Instead, use the /dev/serial/by-id/X serial device for your printer.
-  hostPath: /dev/serial/by-id/usb-Prusa_Research__prusa3d.com__Original_Prusa_i3_MK3_CZPX0221X004XK44811-if00
-  hostPathType: CharDevice
+env:
+  MJPEG_STREAMER_AUTOSTART: "{{ .Values.persistence.webcam.enabled }}"
+  OCTOPRINT_PORT: 80
 
-tcpPrinter:
-  enabled: false
-  host: "printer.example.com"
-  port: 3333
-
-webcam:
-  enabled: true
-  hostPath: /dev/video0
-  hostPathType: CharDevice
-
-nameOverride: ""
-fullnameOverride: ""
+persistence:
+  config:
+    enabled: true
+    type: pvc
+    size: 1Gi
+  printer:
+    enabled: true
+    type: hostPath
+    # Do not use /dev/ttyUSBX serial devices, as those mappings can change over time.
+    # Instead, use the /dev/serial/by-id/X serial device for your printer.
+    hostPath: /dev/serial/by-id/usb-Prusa_Research__prusa3d.com__Original_Prusa_i3_MK3_CZPX0221X004XK44811-if00
+    hostPathType: CharDevice
+    mountPath: /dev/printer
+  webcam:
+    enabled: true
+    type: hostPath
+    hostPath: /dev/video0
+    hostPathType: CharDevice
 
 service:
-  type: ClusterIP
-  port: 80
+  main:
+    ports:
+      http:
+        port: 80
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: nigelarmstrong-me-issuer
-  paths: ["/"]
-  hosts: ["octoprint.kube.home.nigelarmstrong.me"]
-  tls:
-  - secretName: octopritn-kube-home-nigelarmstrong-me-tls
+  main:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: nigelarmstrong-me-issuer
     hosts:
-    - octoprint.kube.home.nigelarmstrong.me
+    - host: octoprint.kube.home.nigelarmstrong.me
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - secretName: octopritn-kube-home-nigelarmstrong-me-tls
+      hosts:
+      - octoprint.kube.home.nigelarmstrong.me
 
-resources: {}
-nodeSelector: {}
-tolerations: []
+
 affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
