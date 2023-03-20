@@ -21,6 +21,7 @@ env:
 persistence:
   config:
     enabled: true
+    mountPath: /octoprint
     type: pvc
     size: 2Gi
   printer:
